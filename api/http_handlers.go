@@ -1,0 +1,136 @@
+package api
+
+import (
+	"encoding/hex"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
+	"stoo-kv/config"
+	"stoo-kv/internal"
+	"stoo-kv/internal/crypto"
+)
+
+type Handler struct {
+	storage internal.Store
+	config  *config.Config
+}
+
+func NewHandler(storage internal.Store, config *config.Config) *Handler {
+	return &Handler{
+		config:  config,
+		storage: storage,
+	}
+}
+func (h Handler) GetHandler(c *gin.Context) {
+	namespace := c.Param("namespace")
+	profile := c.Param("profile")
+	key := c.Param("key")
+	value, err := h.storage.Get(fmt.Sprintf("%s::%s::%s", namespace, profile, key))
+	if err != nil {
+		log.Printf("Failed to read key from storage: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+	if value == "" {
+		HandleError(c, StatusNotFound, "Data not found from storage")
+		return
+	}
+
+	value, err = CheckEncryption(value, h.config)
+	if err != nil {
+		log.Printf("Failed to decrypt the value: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+	HandleSuccess(c, value)
+}
+
+func (h Handler) GetByNamespaceAndProfileHandler(c *gin.Context) {
+	namespace := c.Param("namespace")
+	profile := c.Param("profile")
+	values, err := h.storage.GetByNameSpaceAndProfile(namespace, profile)
+	h.valuesProcessor(c, values, err)
+}
+
+func (h Handler) GetAllHandler(c *gin.Context) {
+	values, err := h.storage.GetAll()
+	h.valuesProcessor(c, values, err)
+}
+
+func (h Handler) SetHandler(c *gin.Context) {
+	namespace := c.Param("namespace")
+	profile := c.Param("profile")
+	params := c.Request.URL.Query()
+	var key, value string
+	for k, v := range params {
+		key = k
+		value = v[0]
+	}
+	if err := h.storage.Set(fmt.Sprintf("%s::%s::%s", namespace, profile, key), value); err != nil {
+		log.Printf("Failed to store data into storage: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+	HandleSuccess(c, "Key set successfully")
+}
+
+func (h Handler) DeleteHandler(c *gin.Context) {
+	namespace := c.Param("namespace")
+	profile := c.Param("profile")
+	key := c.Request.URL.Query().Get("key")
+	if err := h.storage.Delete(fmt.Sprintf("%s::%s::%s", namespace, profile, key)); err != nil {
+		log.Printf("Failed to remove data from storage: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+	HandleSuccess(c, "Key removed successfully")
+}
+
+func (h Handler) EncryptHandler(c *gin.Context) {
+	data, err := c.GetRawData()
+	if err != nil {
+		log.Printf("Failed to parse data: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+
+	ciphertext, err := crypto.Encrypt(data, h.config.EncryptKey)
+	if err != nil {
+		log.Printf("Failed to encrypt data: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+	c.String(http.StatusOK, hex.EncodeToString(ciphertext))
+}
+
+func (h Handler) DecryptHandler(c *gin.Context) {
+	data, err := c.GetRawData()
+	if err != nil {
+		log.Printf("Failed to parse data: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+
+	plaintext, err := crypto.Decrypt(data, h.config.EncryptKey)
+	if err != nil {
+		log.Printf("Failed to decrypt data: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+	c.String(http.StatusOK, string(plaintext))
+}
+
+func (h Handler) valuesProcessor(c *gin.Context, values map[string]string, err error) {
+	if err != nil {
+		log.Printf("Failed to read keys from storage: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+	if len(values) == 0 {
+		log.Printf("Keys not found from storage")
+		HandleError(c, StatusNotFound, "Keys not found from storage")
+		return
+	}
+	HandleSuccess(c, ParseValues(values, h.config))
+}
