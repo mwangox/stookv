@@ -53,6 +53,18 @@ func (r *RedisClient) GetAll() (map[string]string, error) {
 	return keyValues, nil
 }
 
+func (r *RedisClient) GetAllWithNamespaceAndProfile() (map[string]string, error) {
+	keyValues := make(map[string]string)
+	result, err := r.client.HGetAll(r.ctx, r.cfg.Providers.Redis.StoreName).Result()
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range result {
+		keyValues[k] = v
+	}
+	return keyValues, nil
+}
+
 func (r *RedisClient) GetByNameSpaceAndProfile(namespace, profile string) (map[string]string, error) {
 	keyValues := make(map[string]string)
 	result, err := r.client.HGetAll(r.ctx, r.cfg.Providers.Redis.StoreName).Result()

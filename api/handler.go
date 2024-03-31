@@ -95,7 +95,7 @@ func (h Handler) EncryptHandler(c *gin.Context) {
 		return
 	}
 
-	ciphertext, err := crypto.Encrypt(data, h.config.EncryptKey)
+	ciphertext, err := crypto.Encrypt(data, h.config.Application.EncryptKey)
 	if err != nil {
 		log.Printf("Failed to encrypt data: %v", err)
 		HandleGeneralError(c, err.Error())
@@ -112,7 +112,7 @@ func (h Handler) DecryptHandler(c *gin.Context) {
 		return
 	}
 
-	plaintext, err := crypto.Decrypt(data, h.config.EncryptKey)
+	plaintext, err := crypto.Decrypt(data, h.config.Application.EncryptKey)
 	if err != nil {
 		log.Printf("Failed to decrypt data: %v", err)
 		HandleGeneralError(c, err.Error())
@@ -132,5 +132,6 @@ func (h Handler) valuesProcessor(c *gin.Context, values map[string]string, err e
 		HandleError(c, StatusNotFound, "Keys not found from storage")
 		return
 	}
+
 	HandleSuccess(c, ParseValues(values, h.config))
 }

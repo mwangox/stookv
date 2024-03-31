@@ -3,7 +3,7 @@ package cmd
 import (
 	"log"
 	"stoo-kv/api"
-	"stoo-kv/api/rpc"
+	"stoo-kv/api/grpc"
 	"stoo-kv/config"
 	"stoo-kv/internal"
 )
@@ -21,9 +21,9 @@ func Start() error {
 	}
 
 	log.Println("Start GRPC server asynchronously...")
-	if err := rpc.RunGrpcServer(cfg, storage); err != nil {
+	if err := grpc.RunGrpcServer(cfg, storage); err != nil {
 		return err
 	}
 	log.Println("Initialize REST API routes...")
-	return api.InitRoutes(storage, cfg)
+	return api.InitializeRoutes(storage, cfg)
 }

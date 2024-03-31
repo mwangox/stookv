@@ -9,7 +9,7 @@ import (
 	"stoo-kv/internal"
 )
 
-func InitRoutes(storage internal.Store, cfg *config.Config) error {
+func InitializeRoutes(storage internal.Store, cfg *config.Config) error {
 	r := gin.Default()
 	r.Use(cors.Default())
 
@@ -23,8 +23,8 @@ func InitRoutes(storage internal.Store, cfg *config.Config) error {
 	r.POST("/stoo-kv/:namespace/:profile", handler.SetHandler)
 	r.DELETE("/stoo-kv/:namespace/:profile", handler.DeleteHandler)
 	r.POST("/stoo-kv/encrypt", handler.EncryptHandler)
-	if cfg.EnableDecryptEndpoint {
+	if cfg.Application.EnableDecryptEndpoint {
 		r.POST("/stoo-kv/decrypt", handler.DecryptHandler)
 	}
-	return r.Run(net.JoinHostPort("", cfg.ServerPort))
+	return r.Run(net.JoinHostPort("", cfg.Application.ServerPort))
 }

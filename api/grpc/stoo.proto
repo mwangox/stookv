@@ -1,0 +1,61 @@
+syntax = "proto3";
+//protoc --go_out=. --go-grpc_out=. stoo.proto
+option go_package = "./proto";
+
+service KVService {
+  //Get a key
+  rpc GetService (GetRequest) returns (GetResponse) {}
+  //Get keys by namespace and profile
+  rpc GetServiceByNamespaceAndProfile (GetByNamespaceAndProfileRequest) returns (GetByNamespaceAndProfileResponse) {}
+  //Get all keys regardless
+  rpc GetAllService(GetAllRequest) returns (GetAllResponse){}
+  //Set a key
+  rpc SetKeyService(SetKeyRequest) returns (SetKeyResponse){}
+  //Delete a key
+  rpc DeleteKeyService(DeleteKeyRequest) returns (DeleteKeyResponse){}
+}
+
+message GetRequest {
+  string namespace = 1;
+  string profile   = 2;
+  string key       = 3;
+}
+
+message GetResponse {
+  string data = 1;
+}
+message GetAllRequest {}
+
+message GetByNamespaceAndProfileRequest {
+  string namespace = 1;
+  string profile   = 2;
+}
+
+message GetByNamespaceAndProfileResponse {
+  map<string, string> data = 1;
+}
+
+message GetAllResponse {
+  map<string, string> data = 1;
+}
+
+message SetKeyRequest {
+  string namespace = 1;
+  string profile   = 2;
+  string key       = 3;
+  string value     = 4;
+}
+
+message SetKeyResponse {
+  string data = 1;
+}
+
+message DeleteKeyRequest {
+  string namespace = 1;
+  string profile   = 2;
+  string key       = 3;
+}
+
+message DeleteKeyResponse {
+  string data = 1;
+}

@@ -28,13 +28,13 @@ func HandleSuccess(c *gin.Context, data any) {
 	})
 }
 func CheckEncryption(value string, config *config.Config) (string, error) {
-	encPrefix := config.EncryptPrefix
+	encPrefix := config.Application.EncryptPrefix
 	if encPrefix == "" {
 		encPrefix = "{ENC} "
 	}
 	encValue, status := strings.CutPrefix(value, encPrefix)
 	if status {
-		valueByte, err := crypto.Decrypt([]byte(encValue), config.EncryptKey)
+		valueByte, err := crypto.Decrypt([]byte(encValue), config.Application.EncryptKey)
 		if err != nil {
 			return "", err
 		}

@@ -1,0 +1,37 @@
+{
+  "redis": {
+    "host": "localhost",
+    "port": "6379",
+    "password": "",
+    "database": 0,
+    "store_name": "kv_store",
+    "connection_pool_size": 10
+  },
+  "mysql": {
+    "host": "localhost",
+    "port": "3306",
+    "username": "root",
+    "password": "root",
+    "database_name": "blog"
+  },
+  "postgres": {
+    "host": "localhost",
+    "port": "3306",
+    "username": "root",
+    "password": "root",
+    "database_name": "key_value",
+    "ssl_mode": "disabled",
+    "timezone": "Africa/Nairobi"
+  },
+  "mongo": {
+    "mongo_uri": "mongodb://localhost:27017",
+    "database_name": "key_value",
+    "collection_name": "kv_store"
+  },
+  "etcd": {
+    "endpoints": ["http://155.12.30.14:2379"],
+    "username": "admin",
+    "password": "admin",
+    "dial_timeout": 20
+  }
+}

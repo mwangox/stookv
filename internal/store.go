@@ -15,7 +15,7 @@ type Store interface {
 }
 
 func NewStorage(config *config.Config) (Store, error) {
-	switch config.StorageType {
+	switch config.Application.StorageType {
 	case "redis":
 		return provider.NewRedisClient(context.Background(), config), nil
 	case "mysql":

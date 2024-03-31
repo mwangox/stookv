@@ -1,32 +1,33 @@
-package rpc
+package grpc
 
 import (
 	"context"
 	"errors"
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"stoo-kv/api"
-	"stoo-kv/api/rpc/proto"
+	"stoo-kv/api/grpc/proto"
 	"stoo-kv/config"
 	"stoo-kv/internal"
 )
 
-type GrpcServer struct {
+type Server struct {
 	storage internal.Store
 	config  *config.Config
 	proto.UnimplementedKVServiceServer
 }
 
-func NewGrpcServer(storage internal.Store, config *config.Config) *GrpcServer {
-	return &GrpcServer{
+func NewGrpcServer(storage internal.Store, config *config.Config) *Server {
+	return &Server{
 		config:  config,
 		storage: storage,
 	}
 }
-func (s *GrpcServer) GetService(ctx context.Context, request *proto.GetRequest) (*proto.GetResponse, error) {
+func (s *Server) GetService(ctx context.Context, request *proto.GetRequest) (*proto.GetResponse, error) {
 	value, err := s.storage.Get(fmt.Sprintf("%s::%s::%s", request.Namespace, request.Profile, request.Key))
 	if err != nil {
 		log.Printf("Failed to read key from storage: %v", err)
@@ -45,7 +46,7 @@ func (s *GrpcServer) GetService(ctx context.Context, request *proto.GetRequest) 
 	return &proto.GetResponse{Data: value}, nil
 }
 
-func (s *GrpcServer) GetAllService(ctx context.Context, request *proto.GetAllRequest) (*proto.GetAllResponse, error) {
+func (s *Server) GetAllService(ctx context.Context, request *proto.GetAllRequest) (*proto.GetAllResponse, error) {
 	values, err := s.storage.GetAll()
 	if err != nil {
 		log.Printf("Failed to read keys from storage: %v", err)
@@ -58,7 +59,7 @@ func (s *GrpcServer) GetAllService(ctx context.Context, request *proto.GetAllReq
 	return &proto.GetAllResponse{Data: api.ParseValues(values, s.config)}, nil
 }
 
-func (s *GrpcServer) GetServiceByNamespaceAndProfile(ctx context.Context, request *proto.GetByNamespaceAndProfileRequest) (*proto.GetByNamespaceAndProfileResponse, error) {
+func (s *Server) GetServiceByNamespaceAndProfile(ctx context.Context, request *proto.GetByNamespaceAndProfileRequest) (*proto.GetByNamespaceAndProfileResponse, error) {
 	values, err := s.storage.GetByNameSpaceAndProfile(request.Namespace, request.Profile)
 	if err != nil {
 		log.Printf("Failed to read keys from storage: %v", err)
@@ -71,7 +72,7 @@ func (s *GrpcServer) GetServiceByNamespaceAndProfile(ctx context.Context, reques
 	return &proto.GetByNamespaceAndProfileResponse{Data: api.ParseValues(values, s.config)}, nil
 }
 
-func (s *GrpcServer) SetKeyService(ctx context.Context, request *proto.SetKeyRequest) (*proto.SetKeyResponse, error) {
+func (s *Server) SetKeyService(ctx context.Context, request *proto.SetKeyRequest) (*proto.SetKeyResponse, error) {
 	if err := s.storage.Set(fmt.Sprintf("%s::%s::%s", request.Namespace, request.Profile, request.Key), request.Value); err != nil {
 		log.Printf("Failed to store data into storage: %v", err)
 		return nil, err
@@ -79,7 +80,7 @@ func (s *GrpcServer) SetKeyService(ctx context.Context, request *proto.SetKeyReq
 	return &proto.SetKeyResponse{Data: "Data saved successfully"}, nil
 }
 
-func (s *GrpcServer) DeleteKeyService(ctx context.Context, request *proto.DeleteKeyRequest) (*proto.DeleteKeyResponse, error) {
+func (s *Server) DeleteKeyService(ctx context.Context, request *proto.DeleteKeyRequest) (*proto.DeleteKeyResponse, error) {
 	if err := s.storage.Delete(fmt.Sprintf("%s::%s::%s", request.Namespace, request.Profile, request.Key)); err != nil {
 		log.Printf("Failed to remove data from storage: %v", err)
 		return nil, err
@@ -88,11 +89,20 @@ func (s *GrpcServer) DeleteKeyService(ctx context.Context, request *proto.Delete
 }
 
 func RunGrpcServer(cfg *config.Config, storage internal.Store) error {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.GrpcPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Application.GrpcPort))
 	if err != nil {
 		return err
 	}
-	s := grpc.NewServer()
+	var options []grpc.ServerOption
+	if cfg.Application.GrpcUseTls {
+		creds, err := credentials.NewServerTLSFromFile(cfg.Application.GrpcServerCert, cfg.Application.GrpcServerKey)
+		if err != nil {
+			log.Fatalf("Failed to create grpc credentials: %v", err)
+		}
+		options = []grpc.ServerOption{grpc.Creds(creds)}
+	}
+
+	s := grpc.NewServer(options...)
 	reflection.Register(s)
 	proto.RegisterKVServiceServer(s, NewGrpcServer(storage, cfg))
 	go func() {

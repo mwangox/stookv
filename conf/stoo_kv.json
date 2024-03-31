@@ -1,46 +1,13 @@
 {
-  "storage_type": "mysql",
+  "storage_type": "mongo",
   "server_port": "9098",
   "grpc_port": "50051",
   "encrypt_key": "abcdefghijklmnopqrstuvwxyzaaaaaa",
   "enable_decrypt_endpoint": true,
   "rdbms_default_table": "kv_store",
   "encrypt_prefix": "{ENC} ",
-  "providers": {
-    "redis": {
-      "host": "localhost",
-      "port": "6379",
-      "password": "",
-      "database": 0,
-      "store_name": "kv_store",
-      "connection_pool_size": 10
-    },
-    "mysql": {
-      "host": "localhost",
-      "port": "3306",
-      "username": "root",
-      "password": "root",
-      "database_name": "blog"
-    },
-    "postgres": {
-      "host": "localhost",
-      "port": "3306",
-      "username": "root",
-      "password": "root",
-      "database_name": "key_value",
-      "ssl_mode": "disabled",
-      "timezone": "Africa/Nairobi"
-    },
-    "mongo": {
-      "mongo_uri": "mongodb://localhost:27017",
-      "database_name": "key_value",
-      "collection_name": "kv_store"
-    },
-    "etcd": {
-      "endpoints": ["http://155.12.30.14:2379"],
-      "username": "admin",
-      "password": "admin",
-      "dial_timeout": 20
-    }
-  }
+  "provider_path": "./conf/providers.json",
+  "grpc_use_tls": false,
+  "grpc_server_cert": "/opt/systems/apps/stoo-kv/api/grpc/certs/server_cert.pem",
+  "grpc_server_key": "/opt/systems/apps/stoo-kv/api/grpc/certs/server_key.pem"
 }
