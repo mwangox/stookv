@@ -37,21 +37,21 @@ func (r *RedisClient) Delete(key string) error {
 	return r.client.HDel(r.ctx, r.cfg.Providers.Redis.StoreName, key).Err()
 }
 
-func (r *RedisClient) GetAll() (map[string]string, error) {
-	keyValues := make(map[string]string)
-	result, err := r.client.HGetAll(r.ctx, r.cfg.Providers.Redis.StoreName).Result()
-	if err != nil {
-		return nil, err
-	}
-	for k, v := range result {
-		if strings.Contains(k, "::") {
-			keyValues[strings.Split(k, "::")[2]] = v
-			continue
-		}
-		keyValues[k] = v
-	}
-	return keyValues, nil
-}
+//func (r *RedisClient) GetAll() (map[string]string, error) {
+//	keyValues := make(map[string]string)
+//	result, err := r.client.HGetAll(r.ctx, r.cfg.Providers.Redis.StoreName).Result()
+//	if err != nil {
+//		return nil, err
+//	}
+//	for k, v := range result {
+//		if strings.Contains(k, "::") {
+//			keyValues[strings.Split(k, "::")[2]] = v
+//			continue
+//		}
+//		keyValues[k] = v
+//	}
+//	return keyValues, nil
+//}
 
 func (r *RedisClient) GetAllWithNamespaceAndProfile() (map[string]string, error) {
 	keyValues := make(map[string]string)

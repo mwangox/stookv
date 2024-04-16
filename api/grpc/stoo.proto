@@ -7,10 +7,11 @@ service KVService {
   rpc GetService (GetRequest) returns (GetResponse) {}
   //Get keys by namespace and profile
   rpc GetServiceByNamespaceAndProfile (GetByNamespaceAndProfileRequest) returns (GetByNamespaceAndProfileResponse) {}
-  //Get all keys regardless
-  rpc GetAllService(GetAllRequest) returns (GetAllResponse){}
-  //Set a key
+  //Set a plain key
   rpc SetKeyService(SetKeyRequest) returns (SetKeyResponse){}
+  //Set a secret key
+  rpc SetSecretKeyService(SetKeyRequest) returns (SetKeyResponse){}
+
   //Delete a key
   rpc DeleteKeyService(DeleteKeyRequest) returns (DeleteKeyResponse){}
 }
@@ -24,7 +25,6 @@ message GetRequest {
 message GetResponse {
   string data = 1;
 }
-message GetAllRequest {}
 
 message GetByNamespaceAndProfileRequest {
   string namespace = 1;
@@ -32,10 +32,6 @@ message GetByNamespaceAndProfileRequest {
 }
 
 message GetByNamespaceAndProfileResponse {
-  map<string, string> data = 1;
-}
-
-message GetAllResponse {
   map<string, string> data = 1;
 }
 

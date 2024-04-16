@@ -7,16 +7,16 @@ import (
 	"log"
 	"net/http"
 	"stoo-kv/config"
-	"stoo-kv/internal"
 	"stoo-kv/internal/crypto"
+	"stoo-kv/internal/store"
 )
 
 type Handler struct {
-	storage internal.Store
+	storage store.Store
 	config  *config.Config
 }
 
-func NewHandler(storage internal.Store, config *config.Config) *Handler {
+func NewHandler(storage store.Store, config *config.Config) *Handler {
 	return &Handler{
 		config:  config,
 		storage: storage,
@@ -53,26 +53,14 @@ func (h Handler) GetByNamespaceAndProfileHandler(c *gin.Context) {
 	h.valuesProcessor(c, values, err)
 }
 
-func (h Handler) GetAllHandler(c *gin.Context) {
-	values, err := h.storage.GetAll()
-	h.valuesProcessor(c, values, err)
-}
+//
+//func (h Handler) GetAllHandler(c *gin.Context) {
+//	values, err := h.storage.GetAll()
+//	h.valuesProcessor(c, values, err)
+//}
 
 func (h Handler) SetHandler(c *gin.Context) {
-	namespace := c.Param("namespace")
-	profile := c.Param("profile")
-	params := c.Request.URL.Query()
-	var key, value string
-	for k, v := range params {
-		key = k
-		value = v[0]
-	}
-	if err := h.storage.Set(fmt.Sprintf("%s::%s::%s", namespace, profile, key), value); err != nil {
-		log.Printf("Failed to store data into storage: %v", err)
-		HandleGeneralError(c, err.Error())
-		return
-	}
-	HandleSuccess(c, "Key set successfully")
+	h.set(c, false)
 }
 
 func (h Handler) DeleteHandler(c *gin.Context) {
@@ -85,6 +73,43 @@ func (h Handler) DeleteHandler(c *gin.Context) {
 		return
 	}
 	HandleSuccess(c, "Key removed successfully")
+}
+
+func (h Handler) SetSecretHandler(c *gin.Context) {
+	h.set(c, true)
+}
+
+func (h Handler) set(c *gin.Context, isSecret bool) {
+	namespace := c.Param("namespace")
+	profile := c.Param("profile")
+	params := c.Request.URL.Query()
+	var key, value string
+	for k, v := range params {
+		key = k
+		value = v[0]
+	}
+
+	if isSecret {
+		ciphertext, err := crypto.Encrypt([]byte(value), h.config.Application.EncryptKey)
+		if err != nil {
+			log.Printf("Failed to encrypt data: %v", err)
+			HandleGeneralError(c, err.Error())
+			return
+		}
+
+		encPrefix := h.config.Application.EncryptPrefix
+		if encPrefix == "" {
+			encPrefix = "{ENC} "
+		}
+
+		value = encPrefix + hex.EncodeToString(ciphertext)
+	}
+	if err := h.storage.Set(fmt.Sprintf("%s::%s::%s", namespace, profile, key), value); err != nil {
+		log.Printf("Failed to store data into storage: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+	HandleSuccess(c, "Key set successfully")
 }
 
 func (h Handler) EncryptHandler(c *gin.Context) {

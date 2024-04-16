@@ -1,4 +1,4 @@
-package internal
+package store
 
 import (
 	"context"
@@ -10,7 +10,7 @@ type Store interface {
 	Set(key string, value any) error
 	Get(key string) (string, error)
 	Delete(key string) error
-	GetAll() (map[string]string, error)
+	//GetAll() (map[string]string, error)
 	GetByNameSpaceAndProfile(namespace, profile string) (map[string]string, error)
 }
 

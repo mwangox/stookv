@@ -1,13 +1,14 @@
 {
-  "storage_type": "mongo",
+  "storage_type": "mysql",
   "server_port": "9098",
+  "server_log_level": "debug",
   "grpc_port": "50051",
   "encrypt_key": "abcdefghijklmnopqrstuvwxyzaaaaaa",
   "enable_decrypt_endpoint": true,
   "rdbms_default_table": "kv_store",
   "encrypt_prefix": "{ENC} ",
-  "provider_path": "./conf/providers.json",
-  "grpc_use_tls": false,
+  "provider_path": "./conf/provider.json",
+  "grpc_use_tls": true,
   "grpc_server_cert": "/opt/systems/apps/stoo-kv/api/grpc/certs/server_cert.pem",
   "grpc_server_key": "/opt/systems/apps/stoo-kv/api/grpc/certs/server_key.pem"
 }

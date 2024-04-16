@@ -32,15 +32,15 @@ func (m *Memory) Delete(key string) error {
 	return nil
 }
 
-func (m *Memory) GetAll() (map[string]string, error) {
-	keyValues := make(map[string]string)
-	m.kv.Range(func(key, value any) bool {
-		//keyValues[strings.Split(key.(string), "::")[2]] = value.(string)
-		keyValues[key.(string)] = value.(string)
-		return true
-	})
-	return keyValues, nil
-}
+//func (m *Memory) GetAll() (map[string]string, error) {
+//	keyValues := make(map[string]string)
+//	m.kv.Range(func(key, value any) bool {
+//		//keyValues[strings.Split(key.(string), "::")[2]] = value.(string)
+//		keyValues[key.(string)] = value.(string)
+//		return true
+//	})
+//	return keyValues, nil
+//}
 
 func (m *Memory) GetByNameSpaceAndProfile(namespace, profile string) (map[string]string, error) {
 	keyValues := make(map[string]string)

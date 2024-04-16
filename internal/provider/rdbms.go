@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"stoo-kv/config"
@@ -32,7 +33,11 @@ func NewMySql(config *config.Config) (*Rdbms, error) {
 		return nil, err
 	}
 
-	return &Rdbms{db: db,
+	if err := db.Table(config.Application.RdbmsDefaultTable).AutoMigrate(&kv{}); err != nil {
+		return nil, err
+	}
+	return &Rdbms{
+		db:  db,
 		cfg: config}, nil
 }
 
@@ -50,48 +55,74 @@ func NewPostgres(config *config.Config) (*Rdbms, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if err := db.Table(config.Application.RdbmsDefaultTable).AutoMigrate(&kv{}); err != nil {
+		return nil, err
+	}
 	return &Rdbms{db: db,
 		cfg: config}, nil
 }
 
 func (r *Rdbms) Set(key string, value any) error {
 	namespace, profile, keyName := splitKey(key)
-	return r.db.Table(r.cfg.Application.RdbmsDefaultTable).Create(map[string]any{
+	data := map[string]any{
 		"namespace": namespace,
 		"profile":   profile,
 		"key":       keyName,
 		"value":     value,
-	}).Error
+	}
+	//Try to ensure no duplicate keys under same namespace and profile
+	if _, err := r.Get(key); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return r.db.Table(r.cfg.Application.RdbmsDefaultTable).Create(data).Error
+		}
+		return err
+	}
+
+	return r.db.Table(r.cfg.Application.RdbmsDefaultTable).
+		Where("`namespace` = ? and `profile` = ? and `key` = ?", namespace, profile, keyName).
+		Updates(data).Error
 }
 
 func (r *Rdbms) Get(key string) (string, error) {
 	namespace, profile, keyName := splitKey(key)
 	keyValue := &kv{}
-	err := r.db.Limit(1).Debug().Table(r.cfg.Application.RdbmsDefaultTable).Where("`namespace` = ? AND `profile` = ? AND `key` = ?", namespace, profile, keyName).Find(keyValue).Error
+	err := r.db.
+		Limit(1).
+		Table(r.cfg.Application.RdbmsDefaultTable).
+		Where("`namespace` = ? AND `profile` = ? AND `key` = ?", namespace, profile, keyName).
+		Find(keyValue).Error
 	return keyValue.Value, err
 }
 
 func (r *Rdbms) Delete(key string) error {
 	namespace, profile, keyName := splitKey(key)
-	return r.db.Table(r.cfg.Application.RdbmsDefaultTable).Where("`namespace` = ? AND `profile` = ? AND `key` = ?", namespace, profile, keyName).Delete(&kv{}).Error
+	return r.db.
+		Table(r.cfg.Application.RdbmsDefaultTable).
+		Where("`namespace` = ? AND `profile` = ? AND `key` = ?", namespace, profile, keyName).
+		Delete(&kv{}).Error
 }
 
-func (r *Rdbms) GetAll() (map[string]string, error) {
-	kvMap := make(map[string]string)
-	var keyValues []kv
-	if err := r.db.Table(r.cfg.Application.RdbmsDefaultTable).Select("`key`", "value").Find(&keyValues).Error; err != nil {
-		return nil, err
-	}
-	for _, entry := range keyValues {
-		kvMap[entry.Key] = entry.Value
-	}
-	return kvMap, nil
-}
+//func (r *Rdbms) GetAll() (map[string]string, error) {
+//	kvMap := make(map[string]string)
+//	var keyValues []kv
+//	if err := r.db.Table(r.cfg.Application.RdbmsDefaultTable).Select("`key`", "value").Find(&keyValues).Error; err != nil {
+//		return nil, err
+//	}
+//	for _, entry := range keyValues {
+//		kvMap[entry.Key] = entry.Value
+//	}
+//	return kvMap, nil
+//}
 
 func (r *Rdbms) GetByNameSpaceAndProfile(namespace, profile string) (map[string]string, error) {
 	kvMap := make(map[string]string)
 	var keyValues []kv
-	if err := r.db.Table(r.cfg.Application.RdbmsDefaultTable).Where("namespace = ? AND profile = ?", namespace, profile).Select("`key`", "value").Find(&keyValues).Error; err != nil {
+	if err := r.db.
+		Table(r.cfg.Application.RdbmsDefaultTable).
+		Where("namespace = ? AND profile = ?", namespace, profile).
+		Select("`key`", "value").
+		Find(&keyValues).Error; err != nil {
 		return nil, err
 	}
 	for _, entry := range keyValues {

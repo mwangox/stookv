@@ -10,8 +10,11 @@ GET http://localhost:9098/stoo-kv/my-app/prod
 ### Set key
 POST  http://localhost:9098/stoo-kv/my-app/prod?database.password={ENC} 17673de9aaf47b0dd3a83d23eddaef5c0184ce5e95e9b31673d5b83cdcb17d4b807da35a
 
-### Set key 2
-POST  http://localhost:9098/stoo-kv/my-app/prod?database.host=host.name
+### Set secret key
+POST  http://localhost:9098/stoo-kv/secrets/my-app/prod?database.password=123456aaa*
+
+### Set plain key
+POST  http://localhost:9098/stoo-kv/my-app/prod?database.username2=root3
 
 ### Delete key
 
@@ -27,4 +30,4 @@ Content-Type: text/plain
 POST  http://localhost:9098/stoo-kv/decrypt
 Content-Type: text/plain
 
-0ad504640a8c485fcb2d62a97a4bfb8ee477b9eb2a2f79bfddc67e93f978380a522c1c66a9fb
+48fa702f0614a5550a4ebf98e2541e8708afe23bce365d14c100d1b7d1c455534e433ed32867ffdfdf

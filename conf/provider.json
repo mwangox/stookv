@@ -12,7 +12,7 @@
     "port": "3306",
     "username": "root",
     "password": "root",
-    "database_name": "blog"
+    "database_name": "key_value"
   },
   "postgres": {
     "host": "localhost",

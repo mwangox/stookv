@@ -48,9 +48,9 @@ func (e *EtcdClient) Delete(key string) error {
 	return err
 }
 
-func (e *EtcdClient) GetAll() (map[string]string, error) {
-	return e.findAll("")
-}
+//func (e *EtcdClient) GetAll() (map[string]string, error) {
+//	return e.findAll("")
+//}
 
 func (e *EtcdClient) GetByNameSpaceAndProfile(namespace, profile string) (map[string]string, error) {
 	return e.findAll(fmt.Sprintf("%s::%s", namespace, profile))

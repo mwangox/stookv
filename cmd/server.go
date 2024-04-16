@@ -5,7 +5,7 @@ import (
 	"stoo-kv/api"
 	"stoo-kv/api/grpc"
 	"stoo-kv/config"
-	"stoo-kv/internal"
+	"stoo-kv/internal/store"
 )
 
 func Start() error {
@@ -15,7 +15,7 @@ func Start() error {
 		return err
 	}
 	log.Println("Initialize key value pairs storage...")
-	storage, err := internal.NewStorage(cfg)
+	storage, err := store.NewStorage(cfg)
 	if err != nil {
 		return err
 	}

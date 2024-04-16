@@ -1,1 +1,1 @@
-./api/grpc/certs
+./api/grpc/certs/**

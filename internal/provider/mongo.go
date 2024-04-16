@@ -30,6 +30,10 @@ func NewMongoClient(ctx context.Context, config *config.Config) (*MongoClient, e
 }
 
 func (m *MongoClient) Set(key string, value any) error {
+	//Make sure key is deleted before being set to avoid duplicate
+	if err := m.Delete(key); err != nil {
+		return err
+	}
 	_, err := m.collection.InsertOne(m.ctx, bson.D{{"key", key}, {"value", value}})
 	return err
 }
@@ -44,21 +48,22 @@ func (m *MongoClient) Get(key string) (string, error) {
 }
 
 func (m *MongoClient) Delete(key string) error {
-	_, err := m.collection.DeleteOne(m.ctx, bson.D{{"key", key}})
+	_, err := m.collection.DeleteMany(m.ctx, bson.D{{"key", key}})
 	return err
 }
-func (m *MongoClient) GetAll() (map[string]string, error) {
-	keyValues := make(map[string]string)
-	results, err := m.findAll()
-	if err != nil {
-		return validateError(err)
-	}
 
-	for k, v := range results {
-		keyValues[strings.Split(k, "::")[2]] = v
-	}
-	return keyValues, nil
-}
+//func (m *MongoClient) GetAll() (map[string]string, error) {
+//	keyValues := make(map[string]string)
+//	results, err := m.findAll()
+//	if err != nil {
+//		return validateError(err)
+//	}
+//
+//	for k, v := range results {
+//		keyValues[strings.Split(k, "::")[2]] = v
+//	}
+//	return keyValues, nil
+//}
 
 func (m *MongoClient) GetByNameSpaceAndProfile(namespace, profile string) (map[string]string, error) {
 	keyValues := make(map[string]string)
