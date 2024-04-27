@@ -63,18 +63,6 @@ func (h Handler) SetHandler(c *gin.Context) {
 	h.set(c, false)
 }
 
-func (h Handler) DeleteHandler(c *gin.Context) {
-	namespace := c.Param("namespace")
-	profile := c.Param("profile")
-	key := c.Request.URL.Query().Get("key")
-	if err := h.storage.Delete(fmt.Sprintf("%s::%s::%s", namespace, profile, key)); err != nil {
-		log.Printf("Failed to remove data from storage: %v", err)
-		HandleGeneralError(c, err.Error())
-		return
-	}
-	HandleSuccess(c, "Key removed successfully")
-}
-
 func (h Handler) SetSecretHandler(c *gin.Context) {
 	h.set(c, true)
 }
@@ -110,6 +98,18 @@ func (h Handler) set(c *gin.Context, isSecret bool) {
 		return
 	}
 	HandleSuccess(c, "Key set successfully")
+}
+
+func (h Handler) DeleteHandler(c *gin.Context) {
+	namespace := c.Param("namespace")
+	profile := c.Param("profile")
+	key := c.Request.URL.Query().Get("key")
+	if err := h.storage.Delete(fmt.Sprintf("%s::%s::%s", namespace, profile, key)); err != nil {
+		log.Printf("Failed to remove data from storage: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+	HandleSuccess(c, "Key removed successfully")
 }
 
 func (h Handler) EncryptHandler(c *gin.Context) {

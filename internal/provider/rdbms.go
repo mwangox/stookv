@@ -2,7 +2,6 @@ package provider
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"stoo-kv/config"
@@ -71,17 +70,10 @@ func (r *Rdbms) Set(key string, value any) error {
 		"key":       keyName,
 		"value":     value,
 	}
-	//Try to ensure no duplicate keys under same namespace and profile
-	if _, err := r.Get(key); err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return r.db.Table(r.cfg.Application.RdbmsDefaultTable).Create(data).Error
-		}
-		return err
-	}
-
 	return r.db.Table(r.cfg.Application.RdbmsDefaultTable).
+		Assign(data).
 		Where("`namespace` = ? and `profile` = ? and `key` = ?", namespace, profile, keyName).
-		Updates(data).Error
+		FirstOrCreate(&kv{}).Error //Try to ensure no duplicate keys under same namespace and profile
 }
 
 func (r *Rdbms) Get(key string) (string, error) {

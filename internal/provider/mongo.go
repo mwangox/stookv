@@ -30,11 +30,10 @@ func NewMongoClient(ctx context.Context, config *config.Config) (*MongoClient, e
 }
 
 func (m *MongoClient) Set(key string, value any) error {
-	//Make sure key is deleted before being set to avoid duplicate
-	if err := m.Delete(key); err != nil {
-		return err
-	}
-	_, err := m.collection.InsertOne(m.ctx, bson.D{{"key", key}, {"value", value}})
+	filter := bson.D{{key, value}}
+	document := bson.D{{"$set", bson.D{{key, value}}}}
+	opts := options.Update().SetUpsert(true)
+	_, err := m.collection.UpdateOne(m.ctx, filter, document, opts)
 	return err
 }
 

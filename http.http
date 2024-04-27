@@ -14,7 +14,7 @@ POST  http://localhost:9098/stoo-kv/my-app/prod?database.password={ENC} 17673de9
 POST  http://localhost:9098/stoo-kv/secrets/my-app/prod?database.password=123456aaa*
 
 ### Set plain key
-POST  http://localhost:9098/stoo-kv/my-app/prod?database.username2=root3
+POST  http://localhost:9098/stoo-kv/my-app/prod?database.password=123456a*
 
 ### Delete key
 
