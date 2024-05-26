@@ -16,6 +16,11 @@ type Handler struct {
 	config  *config.Config
 }
 
+type KV struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 func NewHandler(storage store.Store, config *config.Config) *Handler {
 	return &Handler{
 		config:  config,
@@ -70,11 +75,19 @@ func (h Handler) SetSecretHandler(c *gin.Context) {
 func (h Handler) set(c *gin.Context, isSecret bool) {
 	namespace := c.Param("namespace")
 	profile := c.Param("profile")
-	params := c.Request.URL.Query()
-	var key, value string
-	for k, v := range params {
-		key = k
-		value = v[0]
+	kv := &KV{}
+	if err := c.ShouldBindJSON(kv); err != nil {
+		log.Printf("Failed to decode data: %v", err)
+		HandleGeneralError(c, err.Error())
+		return
+	}
+
+	value := kv.Value
+	key := kv.Key
+	if key == "" {
+		log.Printf("Key cannot be empty")
+		HandleGeneralError(c, "Key name cannot be empty")
+		return
 	}
 
 	if isSecret {
@@ -92,6 +105,7 @@ func (h Handler) set(c *gin.Context, isSecret bool) {
 
 		value = encPrefix + hex.EncodeToString(ciphertext)
 	}
+
 	if err := h.storage.Set(fmt.Sprintf("%s::%s::%s", namespace, profile, key), value); err != nil {
 		log.Printf("Failed to store data into storage: %v", err)
 		HandleGeneralError(c, err.Error())
