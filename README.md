@@ -28,7 +28,7 @@ curl -X POST --location "http://localhost:9098/stoo-kv/my-app/prod" \
     -H "Content-Type: application/json" \
     -d '{
           "key": "database.password",
-          "value": "123456aaa*"
+          "value": "kivyao*2024"
         }'
 ```
 
@@ -38,7 +38,7 @@ curl -X POST --location "http://localhost:9098/stoo-kv/secrets/my-app/prod" \
     -H "Content-Type: application/json" \
     -d '{
           "key": "database.password",
-          "value": "123456aaa*"
+          "value": "kivyetu*2024"
         }'
 ```
 
@@ -158,7 +158,7 @@ Also, one can opt to use manual encryption or decryption REST APIs as:
 ```shell
 curl -X POST --location "http://localhost:9098/stoo-kv/encrypt" \
     -H "Content-Type: text/plain" \
-    -d '123456a*'
+    -d 'sote*2024'
 ```
 
 ###### Decrypt
