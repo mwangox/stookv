@@ -137,10 +137,22 @@ Storage type is specified in the configuration file under key `storage_type`. In
 specified explicit it will default to `memory`.
 If you want to add your own storage implementation that is not available in the list above, just implement the [store](./internal/store/store.go) interface and add it accordingly.
 
+### Available StooKV SDKs
+You can use `StooKV` without use of these SDKs by simply calling the REST or gRPC APIs. But you don't want to bother
+with underlying low level implementations, you can use either of these based on your language preference:
+
+- Go: [stogo](https://github.com/mwangox/stogo)
+- Java: [stoja](https://github.com/mwangox/stoja)
+- Rust: [storus](https://github.com/mwangox/stogo)
+- Spring Boot Starter: [stoja-spring-boot-starter](https://github.com/mwangox/stoja-spring-boot-starter) (Java framework)
+
+For those who want to implement their own SDK(s), I recommend to use gRPC APIs instead of REST APIs due to its associated benefits. All the mentioned SDKs above
+use gRPC APIs to interact with `stookv` instance.
+
 ### Secrets Encryption
-StooKV supports encryption of properties if one needs to store configurations that should not be naked like passwords, auth keys etc.
-Stookv is using AES with GCM mode to encrypt values. To use this feature, first you need to set encryption key `encrypt_key` in the configuration file. The key length should be
-either of 128, 192 or 256 bits. Then you can use any of your preferred API to set your secrets.
+`StooKV` supports encryption of properties if one needs to store configurations that should not be naked like passwords, auth keys etc.
+Stookv is using **AES** with **GCM** mode to encrypt values. To use this feature, first you need to set encryption key `encrypt_key` in the configuration file. The key length should be
+either of `128`, `192` or `256` bits. Then you can use any of your preferred API to set your secrets.
 Also, one can opt to use manual encryption or decryption REST APIs as:
 ###### Encrypt
 ```shell
