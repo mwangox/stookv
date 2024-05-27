@@ -56,7 +56,7 @@ curl -X DELETE --location "http://localhost:9098/stoo-kv/my-app/prod?key=databas
 curl -X GET --location "http://localhost:9098/stoo-kv/my-app/prod"
 ```
 ### Configurations
-There are general stookv configurations in `stoo_kv.json` and storage provider specific configurations in `provider.json`. 
+General stookv configurations are in `stoo_kv.json` and storage provider specific configurations are in `provider.json`. 
 
 General configurations definitions as in [stoo_kv.json](./conf/stoo_kv.json).
 
@@ -76,7 +76,8 @@ General configurations definitions as in [stoo_kv.json](./conf/stoo_kv.json).
 | `grpc_server_key`       | `/stoo-kv/grpc/certs/server_key.pem`  | Path to the gRPC server key         |
 
 
-Storage providers specific configurations as in [provider.json](./conf/provider.json).
+Sample configurations for each of the supported storage providers are shown in [provider.json](./conf/provider.json). 
+You may remove the configurations for provider(s) which you don't need in your setup.
 ###### Redis Configuration
 | Key                     | Example     | Description                           |
 |-------------------------|-------------|---------------------------------------|
