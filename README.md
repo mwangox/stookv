@@ -125,7 +125,7 @@ You may remove the configurations for provider(s) which you don't need in your s
 | `dial_timeout`          | `20`                           | Dial timeout for Etcd (in seconds)             |
 
 ### Supported Backend Storages
-The following is the list of current supported storage types, more to be added in the future releases.
+The following is the list of currently supported storage types, with more to be added in future releases.
 - Redis
 - Mongo
 - Etcd
@@ -134,27 +134,26 @@ The following is the list of current supported storage types, more to be added i
 - Postgres
 - Memory
 
-Storage type is specified in the configuration file under key `storage_type`. In case if storage type is not
-specified explicit it will default to `memory`.
-If you want to add your own storage implementation that is not available in the list above, just implement the [store](./internal/store/store.go) interface and add it accordingly.
+Storage type is specified in the configuration file under key `storage_type`. In case the storage type is not specified explicitly it will default to `memory`.
+If you want to add your storage implementation that is not available in the list above, just implement the [store](./internal/store/store.go) interface and add it accordingly.
 
 ### Available StooKV SDKs
-You can use `StooKV` without use of these SDKs by simply calling the REST or gRPC APIs using any tool of your choice. But you don't want to bother
-with underlying low level implementations, you can use any of these based on your preferred language:
+You can use `StooKV` without use of these SDKs by simply calling the REST or gRPC APIs using any tool of your choice. If you don't want to bother
+with the underlying low-level implementations, you can use any of these based on your preferred language:
 
 - Go: [stogo](https://github.com/mwangox/stogo)
 - Java: [stoja](https://github.com/mwangox/stoja)
 - Rust: [storus](https://github.com/mwangox/stogo)
 - Spring Boot Starter: [stoja-spring-boot-starter](https://github.com/mwangox/stoja-spring-boot-starter) (Java framework)
 
-**NOTE**: For those who want to implement their own SDK(s), I recommend to use gRPC APIs instead of REST APIs due to its associated benefits. All the SDKs mentioned above
-use gRPC APIs to interact with `stookv` instance.
+For those who want to implement their own SDK(s), I recommend using gRPC APIs instead of REST APIs due to their associated benefits. All the SDKs mentioned above
+use gRPC APIs to interact with the `stookv` instance. Please visit the respective repository for more details on the SDK usage. n
 
 ### Secrets Encryption
 `StooKV` supports encryption of values if one needs to store configurations that should not be plain/visible like passwords, tokens, auth keys etc.
 Stookv is using **AES** with **GCM** mode to encrypt values. To use this feature, firstly, you need to set encryption key `encrypt_key` in the configuration file. The key length should be
-either of `128`, `192` or `256` bits. Then you can use any of your preferred API to set your secrets.
-Also, one can opt to use manual encryption or decryption REST APIs endpoints as:
+either `128`, `192`, or `256` bits. Then you can use any of your preferred APIs to set your secrets.
+Also, one can opt to use manual encryption or decryption REST API endpoints as:
 ###### Encrypt
 ```shell
 curl -X POST --location "http://localhost:9098/stoo-kv/encrypt" \
@@ -168,7 +167,7 @@ curl -X POST --location "http://localhost:9098/stoo-kv/decrypt" \
     -H "Content-Type: text/plain" \
     -d '48fa702f0614a5550a4ebf98e2541e8708afe23bce365d14c100d1b7d1c455534e433ed32867ffdfdf'
 ```
-**NOTE**: Decryption endpoint is not enabled by default, you need to enable it in the configuration file before using it.
+The decryption endpoint is not enabled by default, you need to enable it in the configuration file before using it.
 
 
 ### Installation
