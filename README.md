@@ -56,7 +56,7 @@ curl -X DELETE --location "http://localhost:9098/stoo-kv/my-app/prod?key=databas
 curl -X GET --location "http://localhost:9098/stoo-kv/my-app/prod"
 ```
 ### Configurations
-General stookv configurations are stored in `stoo_kv.json` and storage provider specific configurations are stored in `provider.json`. 
+General stookv configurations are stored in `stoo_kv.json` and storage provider-specific configurations are stored in `provider.json`. 
 
 General configurations definitions as in [stoo_kv.json](./conf/stoo_kv.json).
 
@@ -77,7 +77,7 @@ General configurations definitions as in [stoo_kv.json](./conf/stoo_kv.json).
 
 
 Sample configurations for each of the supported storage providers are shown in [provider.json](./conf/provider.json). 
-You may remove the configurations for provider(s) which you don't need in your setup.
+You may remove the configurations for the provider(s) that you don't need in your setup.
 ###### Redis Configuration
 | Key                     | Example     | Description                           |
 |-------------------------|-------------|---------------------------------------|
@@ -138,7 +138,7 @@ Storage type is specified in the configuration file under key `storage_type`. In
 If you want to add your storage implementation that is not available in the list above, just implement the [store](./internal/store/store.go) interface and add it accordingly.
 
 ### Available StooKV SDKs
-You can use `StooKV` without use of these SDKs by simply calling the REST or gRPC APIs using any tool of your choice. If you don't want to bother
+You can use `StooKV` without the use of these SDKs by simply calling the REST or gRPC APIs using any tool of your choice. If you don't want to bother
 with the underlying low-level implementations, you can use any of these based on your preferred language:
 
 - Go: [stogo](https://github.com/mwangox/stogo)
@@ -186,6 +186,6 @@ The project is licensed under [MIT license](./LICENSE).
 
 ### Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally submitted
+Unless you explicitly state otherwise, any Contribution intentionally submitted
 for inclusion in `stookv` by you, shall be licensed as MIT, without any additional
 terms or conditions.
