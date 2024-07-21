@@ -8,7 +8,7 @@
   "rdbms_default_table": "kv_store",
   "encrypt_prefix": "{ENC} ",
   "provider_path": "./conf/provider.json",
-  "grpc_use_tls": true,
+  "grpc_use_tls": false,
   "grpc_server_cert": "/opt/systems/apps/stoo-kv/api/grpc/certs/server_cert.pem",
   "grpc_server_key": "/opt/systems/apps/stoo-kv/api/grpc/certs/server_key.pem"
 }

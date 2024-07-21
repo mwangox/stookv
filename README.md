@@ -137,7 +137,7 @@ The following is the list of currently supported storage types, with more to be 
 Storage type is specified in the configuration file under key `storage_type`. In case the storage type is not specified explicitly it will default to `memory`.
 If you want to add your storage implementation that is not available in the list above, just implement the [store](./internal/store/store.go) interface and add it accordingly.
 
-### Available StooKV SDKs
+### StooKV SDKs
 You can use `StooKV` without the use of these SDKs by simply calling the REST or gRPC APIs using any tool of your choice. If you don't want to bother
 with the underlying low-level implementations, you can use any of these based on your preferred language:
 
@@ -146,7 +146,7 @@ with the underlying low-level implementations, you can use any of these based on
 - Rust: [storus](https://github.com/mwangox/stogo)
 - Spring Boot Starter: [stoja-spring-boot-starter](https://github.com/mwangox/stoja-spring-boot-starter) (Java framework)
 
-For those who want to implement their own SDK(s), I recommend using gRPC APIs instead of REST APIs due to their associated benefits. All the SDKs mentioned above
+For those who want to implement their own SDK(s), I recommend using gRPC APIs instead of REST APIs due to their high performing nature. All the SDKs mentioned above
 use gRPC APIs to interact with the `stookv` instance. Please visit the respective repository for more details on the SDK usage. n
 
 ### Secrets Encryption
