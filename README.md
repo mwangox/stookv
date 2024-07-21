@@ -143,7 +143,7 @@ with the underlying low-level implementations, you can use any of these based on
 
 - Go: [stogo](https://github.com/mwangox/stogo)
 - Java: [stoja](https://github.com/mwangox/stoja)
-- Rust: [storus](https://github.com/mwangox/stogo)
+- Rust: [storus](https://crates.io/crates/storus)
 - Spring Boot Starter: [stoja-spring-boot-starter](https://github.com/mwangox/stoja-spring-boot-starter) (Java framework)
 
 For those who want to implement their own SDK(s), I recommend using gRPC APIs instead of REST APIs due to their high performing nature. All the SDKs mentioned above
